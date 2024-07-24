@@ -1,0 +1,27 @@
+[build-system]
+requires = [
+    "setuptools >= 61.0",
+    "setuptools-scm",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mprisRecord"
+description = "Record Audio from Pipewire with MPRIS metadata"
+readme = "README.md"
+version = "0.1"
+dependencies = [
+    'setuptools',
+    'mpris~=1.0.2',
+    'PyGObject',
+    'argparser',
+]
+requires-python = ">=3.0"
+authors = [
+    {name = "RaHoni", email = "honisuess@gmail.com"},
+]
+
+
+[project.scripts]
+mprisRecord = "record:cli"
+
