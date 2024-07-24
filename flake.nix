@@ -23,6 +23,8 @@
         mprisRecord = pkgs.mprisRecord;
         default = mprisRecord;
       };
+
+      overlays.default = pythonOverlay;
     }
     );
 }
