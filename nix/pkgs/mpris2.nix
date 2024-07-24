@@ -1,13 +1,13 @@
 {
   lib,
   fetchPypi,
-  python3Packages
+  python3Packages,
 }:
 python3Packages.buildPythonPackage rec {
   pname = "mpris2";
   version = "1.0.2";
-  
-  propagatedBuildInputs = [  ];
+
+  propagatedBuildInputs = [ ];
 
   src = fetchPypi {
     inherit pname version;
@@ -17,4 +17,3 @@ python3Packages.buildPythonPackage rec {
   doCheck = false;
 
 }
-

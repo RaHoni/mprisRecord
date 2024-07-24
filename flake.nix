@@ -6,25 +6,30 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem
-    (system: 
-    let
-      pythonOverlay = import ./nix/overlay.nix;      
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ pythonOverlay ];
-      };
-    in
+  outputs =
     {
-      devShells.default = import ./nix/shell.nix { inherit pkgs; };
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pythonOverlay = import ./nix/overlay.nix;
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ pythonOverlay ];
+        };
+      in
+      {
+        devShells.default = import ./nix/shell.nix { inherit pkgs; };
 
-      packages = rec {
-        mprisRecord = pkgs.mprisRecord;
-        default = mprisRecord;
-      };
+        packages = rec {
+          mprisRecord = pkgs.mprisRecord;
+          default = mprisRecord;
+        };
 
-      overlays.default = pythonOverlay;
-    }
+        overlays.default = pythonOverlay;
+      }
     );
 }
