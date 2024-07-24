@@ -109,9 +109,9 @@ def convert(tracks: List[Track], inputfile: str, albums: set[str], convert_to_mp
     for album in albums:
         if not os.path.exists(musicFolder + album):
             os.mkdir(musicFolder + album)
-    converted_name = record_file[:-len(record_format)] + "mp3"
+    converted_name = inputfile[:-len(record_format)] + "mp3"
     if convert_to_mp3:
-        subprocess.run(ffmpegCmd + ["-i", f"{record_file}", f"{converted_name}"])
+        subprocess.run(ffmpegCmd + ["-i", f"{inputfile}", f"{converted_name}"])
     else:
         converted_name = inputfile
     processes = set()
@@ -143,7 +143,7 @@ def write_split():
 
 def main(player, mprisID):
     global mprisPlayer, track, first_title, last_title, albums, first_album, record_format, record_file, pw_cat, recordStart, times, mainloop
-    if player!=None:
+    if player==None:
         player = mprisID
     mprisPlayer = Player(dbus_interface_info={'dbus_uri': '.'.join([Interfaces.MEDIA_PLAYER, mprisID])})
     mprisPlayer.PropertiesChanged = change_handler
@@ -171,10 +171,19 @@ def cli():
             prog="mprisRecordPW",
             description="Record Audio with Pipewire and split it according to mpris data."
             )
-    parser.add_argument('playername', nargs="?", metavar="player", help="The name of the mpris Player", default="spotify", choices=SomePlayers.get_dict().values())
+    parser.add_argument('--playername', nargs="?", metavar="player", help="The name of the mpris Player", default="spotify", choices=SomePlayers.get_dict().values())
     parser.add_argument('--pw-name', dest="pwName",  help="The name to connect to in Pipewire")
+    parser.add_argument('--convert', dest="backup_file", type=argparse.FileType('rb'), help="Convert an allready recorded file useing the backup_file" )
     arguments = parser.parse_args()
-    main(mprisID=arguments.playername, player=arguments.pwName)
+    if arguments.backup_file!=None:
+        data = pickle.load(arguments.backup_file)
+        print(data)
+        record_file = data['inputFile']
+        albums = data['albums']
+        times = data['tracks']
+        convert(times, record_file, albums)
+    else:
+        main(mprisID=arguments.playername, player=arguments.pwName)
 
 if __name__ == '__main__':
     cli()
