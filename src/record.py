@@ -28,6 +28,8 @@ class Track:
     track: int
     start: timedelta
     stop: timedelta = timedelta(0)
+    def escapedTitle(self):
+        return self.title.replace('/', '_')
 
     def to_list(self, in_file: str) -> List[str]:
         metadata = [f"title={self.title}", f"album={self.album}", f"album_artist={self.album_artist}",
@@ -44,9 +46,9 @@ class Track:
             yield "-metadata"
             yield x
         if not (self.album == ""):
-            yield musicFolder + self.album + "/" + self.title + ".mp3"
+            yield musicFolder + self.album + "/" + self.escapedTitle + ".mp3"
         else:
-            yield musicFolder + self.title + ".mp3"
+            yield musicFolder + self.escapedTitle + ".mp3"
 
 
 def make_track(mpris, start_time: datetime.datetime):
