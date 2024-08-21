@@ -25,6 +25,7 @@ python3Packages.buildPythonApplication rec {
     pygobject3
     configargparse
     pkgs.gobject-introspection
+    pkgs.ffmpeg
   ];
 
   src = ../../.;
