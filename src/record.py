@@ -46,9 +46,9 @@ class Track:
             yield "-metadata"
             yield x
         if not (self.album == ""):
-            yield musicFolder + self.album + "/" + self.escapedTitle + ".mp3"
+            yield musicFolder + self.album + "/" + self.escapedTitle() + ".mp3"
         else:
-            yield musicFolder + self.escapedTitle + ".mp3"
+            yield musicFolder + self.escapedTitle() + ".mp3"
 
 
 def make_track(mpris, start_time: datetime.datetime):
