@@ -155,8 +155,10 @@ def main(player, mprisID):
 
     albums = {track.album}
     first_album = track.album
-
-    record_file = "/home/raoul/Music/" + track.album + "." + record_format
+    
+    if not os.path.exists(musicFolder):
+        os.mkdir(musicFolder)
+    record_file = musicFolder + track.album + "." + record_format
     command = ['pw-record', '--target', player, f"{record_file}"]
     print(command)
     pw_cat = subprocess.Popen(command)
@@ -169,14 +171,19 @@ def main(player, mprisID):
 
 def cli():
     import argparse
+    global musicFolder
     parser = argparse.ArgumentParser(
             prog="mprisRecordPW",
             description="Record Audio with Pipewire and split it according to mpris data."
             )
     parser.add_argument('--playername', nargs="?", metavar="player", help="The name of the mpris Player", default="spotify", choices=SomePlayers.get_dict().values())
     parser.add_argument('--pw-name', dest="pwName",  help="The name to connect to in Pipewire")
-    parser.add_argument('--convert', dest="backup_file", type=argparse.FileType('rb'), help="Convert an allready recorded file useing the backup_file" )
+    parser.add_argument('--convert', dest="backup_file", type=argparse.FileType('rb'), help="Convert an allready recorded file using the backup_file" )
+    parser.add_argument('--dest', default=musicFolder, help="The folder in wich to save the recordings")
     arguments = parser.parse_args()
+    musicFolder = arguments.dest
+    if not musicFolder.endswith("/"):
+        musicFolder = musicFolder+"/"
     if arguments.backup_file!=None:
         data = pickle.load(arguments.backup_file)
         print(data)
