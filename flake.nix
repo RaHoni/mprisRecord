@@ -12,7 +12,7 @@
       nixpkgs,
       flake-utils,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    flake-utils.lib.eachSystem (nixpkgs.lib.lists.remove ["x86-64-darwin" "aarch64-apple-darwin" "x86_64-apple-darwin"] (flake-utils.lib.defaultSystems) ) (
       system:
       let
         pythonOverlay = import ./nix/overlay.nix;
@@ -30,6 +30,17 @@
         };
 
         overlays.default = pythonOverlay;
+
+        # Adding hydraJobs
+        hydraJobs = {
+          # Job to build the mprisRecord package
+          mprisRecord = pkgs.mprisRecord;
+
+          # Job to build the development shell environment
+          devShell = pkgs.mkShell {
+            inherit (self.devShells.${system}) default;
+          };
+        };
       }
     );
 }
