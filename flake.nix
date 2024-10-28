@@ -12,7 +12,7 @@
       nixpkgs,
       flake-utils,
     }:
-    flake-utils.lib.eachSystem (nixpkgs.lib.lists.remove ["x86-64-darwin" "aarch64-apple-darwin" "x86_64-apple-darwin"] (flake-utils.lib.defaultSystems) ) (
+    flake-utils.lib.eachSystem [ "aarch64-linux" "x86_64-linux" ] (
       system:
       let
         pythonOverlay = import ./nix/overlay.nix;
