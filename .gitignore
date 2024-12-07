@@ -1,0 +1,8 @@
+# For auto matik dev shell
+/.direnv
+
+# Python caches
+/__pycache__
+
+# Nix
+/result
