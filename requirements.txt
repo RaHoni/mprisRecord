@@ -1,2 +1,0 @@
-mpris2~=1.0.2
-PyGObject~=3.44.1
