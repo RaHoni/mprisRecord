@@ -32,6 +32,7 @@ class Track:
         return self.title.replace('/', '_')
 
     def to_list(self, in_file: str) -> List[str]:
+        global musicFolder
         metadata = [f"title={self.title}", f"album={self.album}", f"album_artist={self.album_artist}",
                     f"artist={self.artist}", f"disc={self.disc}", f"track={self.track}"]
         options = ["-ss", "{:.6f}".format(self.start.total_seconds() - 0.25), "-to",
@@ -108,7 +109,9 @@ def change_handler(self, *args, **kw):
 
 
 def convert(tracks: List[Track], inputfile: str, albums: set[str], convert_to_mp3: bool = True):
+    global musicFolder
     for album in albums:
+        album.replace('/','_')
         if not os.path.exists(musicFolder + album):
             os.mkdir(musicFolder + album)
     converted_name = inputfile[:-len(record_format)] + "mp3"
