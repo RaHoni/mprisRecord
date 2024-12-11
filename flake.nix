@@ -12,7 +12,7 @@
       nixpkgs,
       flake-utils,
     }:
-    flake-utils.lib.eachSystem [ "aarch64-linux" "x86_64-linux" ] (
+    nixpkgs.lib.recursiveUpdate (flake-utils.lib.eachSystem [ "aarch64-linux" "x86_64-linux" ] (
       system:
       let
         pythonOverlay = import ./nix/overlay.nix;
@@ -42,5 +42,7 @@
           };
         };
       }
-    );
+    )) (flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-darwin" ] (system: {
+      overlays.default = (final: prev: {}); # Provide an empty overlay to not fail
+    }));
 }
