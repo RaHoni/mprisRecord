@@ -8,7 +8,7 @@ python3Packages.buildPythonApplication rec {
   version = "0.1";
   pyproject = true;
 
-  meta.mainProgram = "record";
+  meta.mainProgram = "mprisRecord";
 
   nativeBuildInputs = with python3Packages; [
     pkgs.wrapGAppsNoGuiHook
