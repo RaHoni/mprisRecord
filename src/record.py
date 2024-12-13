@@ -68,6 +68,7 @@ def make_track(mpris, start_time: datetime.datetime):
 mainloop = gi.repository.GLib.MainLoop()
 
 last_title: str = ""
+last_album: str = ""
 times: List[Track]
 first_title: str = ""
 record_file = ""
@@ -75,6 +76,7 @@ record_format = "flac"
 albums: set[str]
 ffmpegCmd = ["ffmpeg", "-nostdin", "-hide_banner", "-y"]
 recordStart: datetime.datetime = datetime.datetime.now()
+only_album = False
 
 pw_cat: subprocess.Popen[str]
 
@@ -96,16 +98,26 @@ def change_handler(self, *args, **kw):
         else:
             mprisPlayer.Play()
 
-    global last_title
+    global last_title, last_album, only_album
+    #print(only_album)
 
     new_title: str = get(Metadata_Map.TITLE)
-    if new_title != last_title:
+    new_album: str = get(Metadata_Map.ALBUM)
+    title_changed = (new_title != last_title)
+    album_changed = (new_album != last_album)
+    split = (title_changed and not only_album) or album_changed
+    #print(f"title: old: {last_title} new: {new_title}")
+    #print(f"album: old: {last_album} new: {new_album}")
+    #print(f"title: {title_changed}, album: {album_changed}, split: {split}")
+    if ((new_title != last_title) and (not only_album)) or (last_album != new_album):
         global albums
         track = make_track(mprisPlayer, recordStart)
+        #print(track)
         albums.add(track.album)
         times[-1].stop = track.start
         times.append(track)
         last_title = track.title
+        last_album = new_album
 
 
 def convert(tracks: List[Track], inputfile: str, albums: set[str], convert_to_mp3: bool = True):
@@ -147,7 +159,7 @@ def write_split():
     sys.exit(0)
 
 def main(player, mprisID):
-    global mprisPlayer, track, first_title, last_title, albums, first_album, record_format, record_file, pw_cat, recordStart, times, mainloop
+    global mprisPlayer, track, first_title, last_title, last_album, albums, first_album, record_format, record_file, pw_cat, recordStart, times, mainloop
     if player==None:
         player = mprisID
     mprisPlayer = Player(dbus_interface_info={'dbus_uri': '.'.join([Interfaces.MEDIA_PLAYER, mprisID])})
@@ -158,6 +170,7 @@ def main(player, mprisID):
 
     albums = {track.album}
     first_album = track.album
+    last_album = first_album
     
     if not os.path.exists(musicFolder):
         os.mkdir(musicFolder)
@@ -174,7 +187,7 @@ def main(player, mprisID):
 
 def cli():
     import argparse
-    global musicFolder
+    global musicFolder, only_album
     parser = argparse.ArgumentParser(
             prog="mprisRecordPW",
             description="Record Audio with Pipewire and split it according to mpris data."
@@ -183,8 +196,12 @@ def cli():
     parser.add_argument('--pw-name', dest="pwName",  help="The name to connect to in Pipewire")
     parser.add_argument('--convert', dest="backup_file", type=argparse.FileType('rb'), help="Convert an allready recorded file using the backup_file" )
     parser.add_argument('--dest', default=musicFolder, help="The folder in wich to save the recordings")
+    parser.add_argument('--audiobook', action="store_true")
     arguments = parser.parse_args()
+    #print(arguments)
     musicFolder = arguments.dest
+    only_album = arguments.audiobook
+    print(only_album)
     if not musicFolder.endswith("/"):
         musicFolder = musicFolder+"/"
     if arguments.backup_file!=None:
@@ -195,7 +212,7 @@ def cli():
         times = data['tracks']
         convert(times, record_file, albums)
     else:
-        main(mprisID=arguments.playername, player=arguments.pwName)
+        main(mprisID=arguments.playername, player=arguments.pwName,)
 
 if __name__ == '__main__':
     cli()
