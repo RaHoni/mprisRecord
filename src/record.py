@@ -119,6 +119,8 @@ def change_handler(self, *args, **kw):
         last_title = track.title
         last_album = new_album
 
+        write_split()
+
 
 def convert(tracks: List[Track], inputfile: str, albums: set[str], convert_to_mp3: bool = True):
     global musicFolder
@@ -143,20 +145,23 @@ def convert(tracks: List[Track], inputfile: str, albums: set[str], convert_to_mp
             p.wait()
 
 
-def write_split():
-    global record_file, times, pw_cat, record_format
-
-    global mainloop
+def stop_record():
+    global pw_cat, mainloop, times, record_file, albums
     mainloop.quit()
     pw_cat.send_signal(4)
     print("Finished recording")
+
+    write_split()
+
+    convert(times, record_file, albums)
+    sys.exit(0)
+
+def write_split():
+    global record_file, times, record_format
+
     data = {"inputFile": record_file, "albums": albums, "tracks": times}
     backup_file = open(list(albums)[0] + datetime.datetime.now().isoformat(timespec='seconds') + "_times.txt", "wb")
     pickle.dump(data, backup_file)
-
-    convert(times, record_file, albums)
-    mainloop.quit()
-    sys.exit(0)
 
 def main(player, mprisID):
     global mprisPlayer, track, first_title, last_title, last_album, albums, first_album, record_format, record_file, pw_cat, recordStart, times, mainloop
