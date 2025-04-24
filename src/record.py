@@ -158,10 +158,10 @@ def stop_record():
     sys.exit(0)
 
 def write_split():
-    global record_file, times, record_format
+    global record_file, times, record_format, musicFolder
 
     data = {"inputFile": record_file, "albums": albums, "tracks": times}
-    backup_file = open(list(albums)[0] + datetime.datetime.now().isoformat(timespec='seconds') + "_times.txt", "wb")
+    backup_file = open(musicFolder + list(albums)[0] + datetime.datetime.now().isoformat(timespec='seconds') + "_times.txt", "wb")
     pickle.dump(data, backup_file)
 
 def main(player, mprisID):
