@@ -94,6 +94,7 @@ def change_handler(self, *args, **kw):
             mprisPlayer.Stop()
             times[-1].stop = datetime.datetime.now() - recordStart
             write_split()
+            stop_record()
             return
         else:
             mprisPlayer.Play()
